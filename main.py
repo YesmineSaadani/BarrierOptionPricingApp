@@ -1,5 +1,3 @@
-!pip install streamlit scipy numpy git+https://github.com/Randy8080/streamlit-extras.git
-
 import streamlit as st
 import math
 from scipy.stats.distributions import norm
