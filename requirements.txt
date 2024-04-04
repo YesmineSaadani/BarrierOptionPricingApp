@@ -1,4 +1,5 @@
-streamlit
-scipy
-numpy
+streamlit==1.22.0
+scipy==1.10.0
+streamlit_extras==0.2.7
 git+https://github.com/Randy8080/streamlit-extras.git
+file:///C:/b/abs_datssh7cer/croot/numpy_and_numpy_base_1672336199388/work
