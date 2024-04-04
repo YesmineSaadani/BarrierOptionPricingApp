@@ -1,8 +1,7 @@
 import streamlit as st
 import math
 import numpy as np
-from streamlit_extras.colored_header import colored_header 
-from streamlit_extras.switch_page_button import switch_page
+
 
 def main():
     st.title("Welcome to the Option Pricing Calculator!")
