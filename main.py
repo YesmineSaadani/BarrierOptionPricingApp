@@ -193,6 +193,56 @@ def barrier_option_page():
         return value, (lower_bound, upper_bound)
 
 
+    def SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos, kappa, theta, rho, v0):
+        """
+        Parameters:
+        S = initial stock price
+        T = t/T = time to maturity
+        r = risk-less short rate
+        X = strike price
+        Sigma = volatility of stock value
+        time_steps = the number of path nodes
+        N_simulation = the number of simulation
+        H = barrier price
+        K = Rebate
+        Nu：down = 1  up = -1
+        Phi: call = 1  put = -1    
+        Pos: 1 = in  ； -1 = out
+        """
+        # Generate random numbers for Monte Carlo simulation
+        np.random.seed(42)
+        z1 = np.random.normal(size=(N_simulation, time_steps))
+        z2 = rho * z1 + np.sqrt(1 - rho**2) * np.random.normal(size=(N_simulation, time_steps))
+
+        # Simulate stock price paths using Heston model
+        dt = T / time_steps
+        vt = np.zeros_like(z1)
+        vt[:, 0] = v0
+        St = np.zeros_like(z1)
+        St[:, 0] = S
+
+        # Calculate European option prices for each simulation path
+        option_prices = np.zeros((N_simulation, time_steps))
+        for i in range(1, time_steps):
+            vt[:, i] = vt[:, i - 1] + kappa * (theta - vt[:, i - 1]) * dt + Sigma * np.sqrt(np.maximum(0, vt[:, i - 1] * dt)) * z2[:, i]
+            St[:, i] = St[:, i - 1] * np.exp((r - q - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
+            payoffs = np.maximum(Phi * St[:, i] - Phi * K, 0)  
+            option_prices[:, i] = payoffs * np.exp(-r * T)
+
+        # Calculate European option price
+        european_option_price = np.mean(option_prices[:, -1])
+
+        print(f"European Option Price: {european_option_price:.2f}")
+
+        # Calculate confidence interval for European call option
+        mean = np.mean(option_prices[:, -1])
+        std_error = np.std(option_prices[:, -1]) / np.sqrt(N_simulation)
+        z_score = 1.96  # Z-score for 95% confidence interval
+        conf_interval = (mean - z_score * std_error, mean + z_score * std_error)
+        print(f"95% Confidence Interval for European Option: {conf_interval}")
+
+
+
     # Streamlit UI
     colored_header(
     label="Barrier Option Pricing Calculator",
@@ -227,10 +277,13 @@ def barrier_option_page():
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
         Monte_Carlo, confidence_interval = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos)
+        SVM_barrier_option, confidence_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos, kappa, theta, rho, v0)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
         st.write('Black-Scholes Monte-Carlo:', Monte_Carlo)
+        st.write('Confidence Interval (95%):', confidence_interval)
+        st.write('Heston Model Monte-Carlo:', SVM_barrier_option)
         st.write('Confidence Interval (95%):', confidence_interval)
 
 
@@ -323,6 +376,3 @@ def european_option_page():
 
 if __name__ == "__main__":
     main()
-
-
-
