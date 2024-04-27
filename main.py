@@ -364,7 +364,7 @@ def european_option_page():
         st.write('Black-Scholes Closed-Form:', option_price_bs)
         st.write('Black-Scholes Monte-Carlo:', option_price_mc)
         st.write('Confidence Interval (95%):',({lower_bound_european}, {upper_bound_european}))
-        st.write("Heston Model = ", european_option_price)
+        st.write("Heston Model : ", european_option_price)
         st.write("Confidence Interval (95%):", conf_interval)
 
 
