@@ -278,7 +278,7 @@ def european_option_page():
 
         return option_price_mc, lower_bound_european, upper_bound_european
     
-    def SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos, kappa, theta, rho, v0):
+    def SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, kappa, theta, rho, v0):
         """
         Parameters:
         S = initial stock price
@@ -340,11 +340,6 @@ def european_option_page():
     Phi = st.sidebar.radio('Option Type (call/put)', ['Call', 'Put'], index=0)
     Phi = 1 if Phi == 'Call' else -1
 
-    if Phi == 1:
-        Pos = st.sidebar.radio('Position (In/Out)', ['In', 'Out'], index=0)
-    else:
-        Pos = st.sidebar.radio('Position (In/Out)', ['In', 'Out'], index=1)
-
     time_steps = 1890
     N_simulation = 10000
     kappa = 2.0
@@ -359,7 +354,7 @@ def european_option_page():
         # Calculate and print the European option prices
         option_price_mc, lower_bound_european, upper_bound_european = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi)
         option_price_bs = bsm_barrier_option(X, S, b, T, r, Sigma, Phi)
-        european_option_price, confidence_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos, kappa, theta, rho, v0)
+        european_option_price, confidence_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, kappa, theta, rho, v0)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', option_price_bs)
