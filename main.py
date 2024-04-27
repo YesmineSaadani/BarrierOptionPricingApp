@@ -192,6 +192,7 @@ def barrier_option_page():
 
         return value, (lower_bound, upper_bound)
 
+
     # Streamlit UI
     colored_header(
     label="Barrier Option Pricing Calculator",
@@ -218,7 +219,10 @@ def barrier_option_page():
     if st.sidebar.button("Calculate!"):
         time_steps = 1890
         N_simulation = 10000
-    
+        kappa = 2.0
+        v0 =0.1
+        theta = 0.1
+        rho = -0.5
 
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
@@ -230,9 +234,9 @@ def barrier_option_page():
         st.write('Confidence Interval (95%):', confidence_interval)
 
 
+
 def european_option_page():
     st.header('European Option Pricing Calculator')
-
     def bsm_barrier_option(X, S, b, T, r, Sigma, Phi):
         d1 = (np.log(S / X) + (r - b + 0.5 * Sigma**2) * T) / (Sigma * np.sqrt(T))
         d2 = d1 - Sigma * np.sqrt(T)
@@ -272,8 +276,8 @@ def european_option_page():
         upper_bound_european = option_price_mc + q * se_european
 
         return option_price_mc, lower_bound_european, upper_bound_european
-    
-    def SVM_barrier_option(S, T, r, K, q, Sigma, time_steps, N_simulation, H, R, Phi, kappa, theta, rho, v0):
+        
+    def SVM_barrier_option(S, T, r, K, q, Sigma, time_steps, N_simulation, R, Phi, kappa, theta, rho, v0):
         """
         Parameters:
         S = initial stock price
@@ -319,8 +323,17 @@ def european_option_page():
         conf_interval = (mean - z_score * std_error, mean + z_score * std_error)
 
         return european_option_price, conf_interval
+    
+
+    np.random.seed(42)
+
 
     # Streamlit UI
+    colored_header(
+        label="European Option Pricing Calculator",
+        description="An European option is the type of options contract that allows the option holder to exercise the option only on the expiration date of the option. Option holders have the right but not the obligation to exercise their options. They can also choose not to use the option and let it expire.",
+    )
+    # Sidebar for user input
     st.sidebar.header('Input Parameters')
     X = st.sidebar.number_input('Strike Price (X)', value=100.0, step=5.0)
     S = st.sidebar.number_input('Initial Stock Price (S)', value=100.0, step=5.0)
@@ -328,37 +341,32 @@ def european_option_page():
     r = st.sidebar.number_input('Risk-free Rate (r)', value=0.08, step=0.01)
     Sigma = st.sidebar.number_input('Volatility (Sigma)', value=0.25, step=0.05)
     K = st.sidebar.number_input('Rebate (K)', value=0.0, step=5.0)
-    b = st.sidebar.number_input('Dividend yield Rate (b)', value=0.0, step=0.01)
+    b = st.sidebar.number_input('Dividend yield Rate (r)', value=0.0, step=0.01)
     Phi = st.sidebar.radio('Option Type (call/put)', ['Call', 'Put'], index=0)
     Phi = 1 if Phi == 'Call' else -1
-
-    if Phi == 1:
-        Pos = st.sidebar.radio('Position (In/Out)', ['In', 'Out'], index=0)
-    else:
-        Pos = st.sidebar.radio('Position (In/Out)', ['In', 'Out'], index=1)
-
-    time_steps = 1890
-    N_simulation = 10000
-    kappa = 2.0
-    v0 = 0.1
-    theta = 0.1
-    rho = -0.5
-
     # Calculate button
     if st.sidebar.button("Calculate!"):
+        time_steps = 1890
+        N_simulation = 10000
+        v0 = 0.1        
+        kappa = 2.0     
+        theta = 0.1     
+        rho = -0.5     
+        
+
         # Calculate and print the European option prices
         option_price_mc, lower_bound_european, upper_bound_european = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi)
         option_price_bs = bsm_barrier_option(X, S, b, T, r, Sigma, Phi)
         european_option_price, conf_interval = SVM_barrier_option(S, T, r,K, q, Sigma, time_steps, N_simulation, R, Phi, kappa, theta, rho, v0)
 
+
         # Display results
         st.write('Black-Scholes Closed-Form:', option_price_bs)
         st.write('Black-Scholes Monte-Carlo:', option_price_mc)
-        st.write('Confidence Interval (95%):', (lower_bound_european, upper_bound_european))
-        st.write('Heston Model:', european_option_price)
-        st.write('Confidence Interval (95%):', conf_interval)
-        
-        
+        st.write('Confidence Interval (95%):',({lower_bound_european}, {upper_bound_european}))
+        st.write("Heston Model = ", european_option_price)
+        st.write("Confidence Interval (95%):", conf_interval)
+
+
 if __name__ == "__main__":
-    main()
     main()
