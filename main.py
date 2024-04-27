@@ -359,7 +359,7 @@ def european_option_page():
         # Calculate and print the European option prices
         option_price_mc, lower_bound_european, upper_bound_european = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi)
         option_price_bs = bsm_barrier_option(X, S, b, T, r, Sigma, Phi)
-        SVM_barrier_option_price, confidence_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos, kappa, theta, rho, v0)
+        european_option_price, confidence_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos, kappa, theta, rho, v0)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', option_price_bs)
