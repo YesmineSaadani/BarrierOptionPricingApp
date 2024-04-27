@@ -365,7 +365,7 @@ def european_option_page():
         st.write('Black-Scholes Closed-Form:', option_price_bs)
         st.write('Black-Scholes Monte-Carlo:', option_price_mc)
         st.write('Confidence Interval (95%):', (lower_bound_european, upper_bound_european))
-        st.write('SVM Barrier Option Monte-Carlo:', SVM_barrier_option_price)
+        st.write('SVM Barrier Option Monte-Carlo:', european_option_price)
         st.write('Confidence Interval (95%):', confidence_interval)
 
 if __name__ == "__main__":
