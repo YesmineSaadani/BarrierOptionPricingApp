@@ -206,7 +206,7 @@ def barrier_option_page():
     r = st.sidebar.number_input('Risk-free Rate (r)', value=0.08, step=0.01)
     Sigma = st.sidebar.number_input('Volatility (Sigma)', value=0.25, step=0.05)
     K = st.sidebar.number_input('Rebate (K)', value=0.0, step=5.0)
-    b = st.sidebar.number_input('Dividend yield Rate (r)', value=0.0, step=0.01)
+    b = st.sidebar.number_input('Dividend yield Rate (q)', value=0.0, step=0.01)
     Pos = st.sidebar.radio('Position (in/out)', ['In', 'Out'], index=0)
     Pos = 1 if Pos == 'In' else -1
     Nu = st.sidebar.radio('Barrier Direction (up/down)', ['Up', 'Down'], index=0)
