@@ -228,12 +228,7 @@ def barrier_option_page():
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
         st.write('Black-Scholes Monte-Carlo:', Monte_Carlo)
         st.write('Confidence Interval (95%):', confidence_interval)
-        
 
-
-import numpy as np
-import streamlit as st
-from scipy.stats import norm
 
 def european_option_page():
     st.header('European Option Pricing Calculator')
@@ -278,7 +273,7 @@ def european_option_page():
 
         return option_price_mc, lower_bound_european, upper_bound_european
     
-    def SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, kappa, theta, rho, v0):
+    def SVM_barrier_option(S, T, r, K, q, Sigma, time_steps, N_simulation, H, R, Phi, kappa, theta, rho, v0):
         """
         Parameters:
         S = initial stock price
@@ -317,14 +312,11 @@ def european_option_page():
         # Calculate European option price
         european_option_price = np.mean(option_prices[:, -1])
 
-        print(f"European Option Price: {european_option_price:.2f}")
-
         # Calculate confidence interval for European call option
         mean = np.mean(option_prices[:, -1])
         std_error = np.std(option_prices[:, -1]) / np.sqrt(N_simulation)
         z_score = 1.96  # Z-score for 95% confidence interval
         conf_interval = (mean - z_score * std_error, mean + z_score * std_error)
-        print(f"95% Confidence Interval for European Option: {conf_interval}")
 
         return european_option_price, conf_interval
 
@@ -340,6 +332,11 @@ def european_option_page():
     Phi = st.sidebar.radio('Option Type (call/put)', ['Call', 'Put'], index=0)
     Phi = 1 if Phi == 'Call' else -1
 
+    if Phi == 1:
+        Pos = st.sidebar.radio('Position (In/Out)', ['In', 'Out'], index=0)
+    else:
+        Pos = st.sidebar.radio('Position (In/Out)', ['In', 'Out'], index=1)
+
     time_steps = 1890
     N_simulation = 10000
     kappa = 2.0
@@ -354,14 +351,15 @@ def european_option_page():
         # Calculate and print the European option prices
         option_price_mc, lower_bound_european, upper_bound_european = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi)
         option_price_bs = bsm_barrier_option(X, S, b, T, r, Sigma, Phi)
-        european_option_price, confidence_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, kappa, theta, rho, v0)
+        european_option_price, conf_interval = SVM_barrier_option(S, T, r,K, q, Sigma, time_steps, N_simulation, H, R, Phi, kappa, theta, rho, v0)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', option_price_bs)
         st.write('Black-Scholes Monte-Carlo:', option_price_mc)
         st.write('Confidence Interval (95%):', (lower_bound_european, upper_bound_european))
-        st.write('SVM Barrier Option Monte-Carlo:', european_option_price)
-        st.write('Confidence Interval (95%):', confidence_interval)
-
+        st.write('Heston Model:', european_option_price)
+        st.write('Confidence Interval (95%):', conf_interval)
+        
+        
 if __name__ == "__main__":
     main()
