@@ -277,7 +277,7 @@ def european_option_page():
 
         return option_price_mc, lower_bound_european, upper_bound_european
         
-    def SVM_barrier_option(S, T, r, K, q, Sigma, time_steps, N_simulation, R, Phi, kappa, theta, rho, v0):
+    def SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi, kappa, theta, rho, v0):
         """
         Parameters:
         S = initial stock price
@@ -309,8 +309,8 @@ def european_option_page():
         option_prices = np.zeros((N_simulation, time_steps))
         for i in range(1, time_steps):
             vt[:, i] = vt[:, i - 1] + kappa * (theta - vt[:, i - 1]) * dt + Sigma * np.sqrt(np.maximum(0, vt[:, i - 1] * dt)) * z2[:, i]
-            St[:, i] = St[:, i - 1] * np.exp((r - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
-            payoffs = np.maximum(Phi * St[:, i] - Phi * K, 0)  
+            St[:, i] = St[:, i - 1] * np.exp((r - b - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
+            payoffs = np.maximum(Phi * St[:, i] - Phi * X, 0)  
             option_prices[:, i] = payoffs * np.exp(-r * T)
 
         # Calculate European option price
@@ -357,7 +357,7 @@ def european_option_page():
         # Calculate and print the European option prices
         option_price_mc, lower_bound_european, upper_bound_european = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi)
         option_price_bs = bsm_barrier_option(X, S, b, T, r, Sigma, Phi)
-        european_option_price, conf_interval = SVM_barrier_option(S, T, r, K, q, Sigma, time_steps, N_simulation, R, Phi, kappa, theta, rho, v0)
+        european_option_price, conf_interval = SVM_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, Phi, kappa, theta, rho, v0)
 
 
         # Display results
