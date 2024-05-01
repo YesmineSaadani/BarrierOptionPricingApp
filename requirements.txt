@@ -2,8 +2,3 @@ streamlit
 streamlit_extras
 numpy
 scipy
-streamlit-chat
-openai
-requests
-Image
-langchain
