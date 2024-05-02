@@ -192,20 +192,20 @@ def barrier_option_page():
 
         return value, (lower_bound, upper_bound)
     
-    def Heston_Model(S, X, T, r, b, v0, kappa, theta, Sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos):
+    def Heston_Model(S, X, T, r, b, v0, kappa, theta, Sigma, rho, N_simulation, time_steps, H, Phi, Nu, Pos):
         # Generate random numbers for Monte Carlo simulation
         np.random.seed(42)
-        z1 = np.random.normal(size=(num_simulations, num_time_steps))
-        z2 = rho * z1 + np.sqrt(1 - rho**2) * np.random.normal(size=(num_simulations, num_time_steps))
+        z1 = np.random.normal(size=(N_simulation, time_steps))
+        z2 = rho * z1 + np.sqrt(1 - rho**2) * np.random.normal(size=(N_simulation, time_steps))
 
         # Simulate stock price paths using Heston model
-        dt = T / num_time_steps
+        dt = T / time_steps
         vt = np.zeros_like(z1)
         vt[:, 0] = v0
         St = np.zeros_like(z1)
         St[:, 0] = S
 
-        for i in range(1, num_time_steps):
+        for i in range(1, time_steps):
             vt[:, i] = vt[:, i - 1] + kappa * (theta - vt[:, i - 1]) * dt + Sigma * np.sqrt(np.maximum(0, vt[:, i - 1] * dt)) * z2[:, i]
             St[:, i] = St[:, i - 1] * np.exp((r - b - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
 
@@ -230,7 +230,7 @@ def barrier_option_page():
                 price = np.where(min_paths < H, payoff, 0)
 
         mean_price = np.mean(price)
-        std_error = np.std(price) / np.sqrt(num_simulations)  # Standard error of the mean
+        std_error = np.std(price) / np.sqrt(N_simulation)  # Standard error of the mean
         z_score = 1.96  # Z-score for 95% confidence interval
         conf_interval = (mean_price - z_score * std_error, mean_price + z_score * std_error)
 
@@ -274,7 +274,7 @@ def barrier_option_page():
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
         Monte_Carlo, confidence_interval = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos)
-        barrier_option_price, conf_interval = Heston_Model(S, X, T, r, b, v0, kappa, theta, Sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
+        barrier_option_price, conf_interval = Heston_Model(S, X, T, r, b, v0, kappa, theta, Sigma, rho, N_simulation, time_steps, H, Phi, Nu, Pos)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
@@ -420,3 +420,4 @@ def european_option_page():
 
 if __name__ == "__main__":
     main()
+
