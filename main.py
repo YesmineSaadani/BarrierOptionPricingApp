@@ -5,9 +5,20 @@ import numpy as np
 from streamlit_extras.colored_header import colored_header 
 from streamlit_extras.switch_page_button import switch_page
 
-
 def main():
     st.title("Welcome to the Option Pricing Calculator!")
+
+    # Introduction section
+    st.markdown(
+        """
+        Option pricing is crucial in finance for making informed decisions in the market. 
+        Whether you're exploring European options or breaking through barriers, 
+        our calculator empowers you to evaluate different option strategies with ease.
+        """
+    )
+
+    # Pink line under "Get Started"
+    st.markdown('<hr style="border: 2px solid #FF4B4B;">', unsafe_allow_html=True)
 
     # Display the buttons container with adjusted left margin
     st.markdown('<div style="text-align: center;">', unsafe_allow_html=True)
@@ -22,6 +33,9 @@ def main():
 
     # Add some space
     st.markdown("<br>", unsafe_allow_html=True)
+   
+    # Fun finance quote at the end
+    st.markdown("> \"The stock market is filled with individuals who know the price of everything, but the value of nothing.\" - Phillip Fisher")
 
     # Render the selected page
     if "page" not in st.session_state:
@@ -32,26 +46,8 @@ def main():
     elif st.session_state.page == "Price European Options":
         european_option_page()
 
-
-# Introductory text and finance quote
-st.markdown(
-    """
-    Option pricing is crucial in finance for making informed decisions in the market. 
-    Whether you're exploring European options or breaking through barriers, 
-    our calculator empowers you to evaluate different option strategies with ease.
-    """
-)
-
-# Pink line under "Get Started"
-st.markdown('<hr style="border: 2px solid #FF4B4B;">', unsafe_allow_html=True)
-
-# Fun finance quote at the end
-st.markdown("> \"The stock market is filled with individuals who know the price of everything, but the value of nothing.\" - Phillip Fisher")
-
-
 def barrier_option_page():
     st.header('Barrier Option Pricing Calculator')
-
     def bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu):
         """
         Parameters:
@@ -285,8 +281,6 @@ def barrier_option_page():
         st.write("Heston Model : ", barrier_option_price)
         st.write("Confidence Interval (95%):", conf_interval)
 
-
-
 def european_option_page():
     st.header('European Option Pricing Calculator')
     def bsm_barrier_option(X, S, b, T, r, Sigma, Phi):
@@ -418,7 +412,6 @@ def european_option_page():
         st.write('Confidence Interval (95%):',({lower_bound_european}, {upper_bound_european}))
         st.write("Heston Model : ", european_option_price)
         st.write("Confidence Interval (95%):", conf_interval)
-
 
 if __name__ == "__main__":
     main()
