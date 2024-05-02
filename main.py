@@ -274,7 +274,7 @@ def barrier_option_page():
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
         Monte_Carlo, confidence_interval = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos)
-        barrier_option_price, conf_interval = Heston_Model(S, X, T, b, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
+        barrier_option_price, conf_interval = Heston_Model(S, X, T, r, b, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
