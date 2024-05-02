@@ -191,6 +191,53 @@ def barrier_option_page():
         upper_bound = value + (z_score * std_dev / np.sqrt(N_simulation))
 
         return value, (lower_bound, upper_bound)
+    
+    def Heston_Model(S0, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos):
+        # Generate random numbers for Monte Carlo simulation
+        np.random.seed(42)
+        z1 = np.random.normal(size=(num_simulations, num_time_steps))
+        z2 = rho * z1 + np.sqrt(1 - rho**2) * np.random.normal(size=(num_simulations, num_time_steps))
+
+        # Simulate stock price paths using Heston model
+        dt = T / num_time_steps
+        vt = np.zeros_like(z1)
+        vt[:, 0] = v0
+        St = np.zeros_like(z1)
+        St[:, 0] = S0
+
+        for i in range(1, num_time_steps):
+            vt[:, i] = vt[:, i - 1] + kappa * (theta - vt[:, i - 1]) * dt + sigma * np.sqrt(np.maximum(0, vt[:, i - 1] * dt)) * z2[:, i]
+            St[:, i] = St[:, i - 1] * np.exp((r - q - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
+
+
+        if Nu ==-1 :
+            if Pos == -1 :
+                max_paths = np.max(St, axis=1)
+                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                price = np.where(max_paths < H, payoff, 0)
+            else :
+                max_paths = np.max(St, axis=1)
+                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                price = np.where(max_paths > H, payoff, 0)
+        else :
+            if Pos == -1 : 
+                min_paths = np.min(St, axis=1)
+                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                price = np.where(min_paths > H, payoff, 0)
+            else :
+                min_paths = np.min(St, axis=1)
+                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                price = np.where(min_paths < H, payoff, 0)
+
+        mean_price = np.mean(price)
+        std_error = np.std(price) / np.sqrt(num_simulations)  # Standard error of the mean
+        z_score = 1.96  # Z-score for 95% confidence interval
+        conf_interval = (mean_price - z_score * std_error, mean_price + z_score * std_error)
+
+        value = mean_price * np.exp(-r * T)
+
+        return value, conf_interval
+    
 
 
     # Streamlit UI
@@ -227,11 +274,14 @@ def barrier_option_page():
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
         Monte_Carlo, confidence_interval = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos)
+        barrier_option_price, conf_interval = Heston_Model(S0, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
         st.write('Black-Scholes Monte-Carlo:', Monte_Carlo)
         st.write('Confidence Interval (95%):', confidence_interval)
+        st.write("Heston Model : ", barrier_option_price)
+        st.write("Confidence Interval (95%):", conf_interval)
 
 
 
