@@ -192,7 +192,7 @@ def barrier_option_page():
 
         return value, (lower_bound, upper_bound)
     
-    def Heston_Model(S0, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos):
+    def Heston_Model(S, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos):
         # Generate random numbers for Monte Carlo simulation
         np.random.seed(42)
         z1 = np.random.normal(size=(num_simulations, num_time_steps))
@@ -203,7 +203,7 @@ def barrier_option_page():
         vt = np.zeros_like(z1)
         vt[:, 0] = v0
         St = np.zeros_like(z1)
-        St[:, 0] = S0
+        St[:, 0] = S
 
         for i in range(1, num_time_steps):
             vt[:, i] = vt[:, i - 1] + kappa * (theta - vt[:, i - 1]) * dt + sigma * np.sqrt(np.maximum(0, vt[:, i - 1] * dt)) * z2[:, i]
@@ -274,7 +274,7 @@ def barrier_option_page():
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
         Monte_Carlo, confidence_interval = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos)
-        barrier_option_price, conf_interval = Heston_Model(S0, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
+        barrier_option_price, conf_interval = Heston_Model(S, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
