@@ -192,7 +192,7 @@ def barrier_option_page():
 
         return value, (lower_bound, upper_bound)
     
-    def Heston_Model(S, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos):
+    def Heston_Model(S, X, T, r, b, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos):
         # Generate random numbers for Monte Carlo simulation
         np.random.seed(42)
         z1 = np.random.normal(size=(num_simulations, num_time_steps))
@@ -207,26 +207,26 @@ def barrier_option_page():
 
         for i in range(1, num_time_steps):
             vt[:, i] = vt[:, i - 1] + kappa * (theta - vt[:, i - 1]) * dt + sigma * np.sqrt(np.maximum(0, vt[:, i - 1] * dt)) * z2[:, i]
-            St[:, i] = St[:, i - 1] * np.exp((r - q - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
+            St[:, i] = St[:, i - 1] * np.exp((r - b - 0.5 * vt[:, i]) * dt + np.sqrt(np.maximum(0, vt[:, i] * dt)) * z1[:, i])
 
 
         if Nu ==-1 :
             if Pos == -1 :
                 max_paths = np.max(St, axis=1)
-                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                payoff = np.maximum(Phi * St[:, -1] - Phi * X, 0)    
                 price = np.where(max_paths < H, payoff, 0)
             else :
                 max_paths = np.max(St, axis=1)
-                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                payoff = np.maximum(Phi * St[:, -1] - Phi * X, 0)    
                 price = np.where(max_paths > H, payoff, 0)
         else :
             if Pos == -1 : 
                 min_paths = np.min(St, axis=1)
-                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                payoff = np.maximum(Phi * St[:, -1] - Phi * X, 0)    
                 price = np.where(min_paths > H, payoff, 0)
             else :
                 min_paths = np.min(St, axis=1)
-                payoff = np.maximum(Phi * St[:, -1] - Phi * K, 0)    
+                payoff = np.maximum(Phi * St[:, -1] - Phi * X, 0)    
                 price = np.where(min_paths < H, payoff, 0)
 
         mean_price = np.mean(price)
@@ -274,7 +274,7 @@ def barrier_option_page():
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
         Monte_Carlo, confidence_interval = mc_barrier_option(S, T, r, X, b, Sigma, time_steps, N_simulation, H, K, Nu, Phi, Pos)
-        barrier_option_price, conf_interval = Heston_Model(S, K, T, r, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
+        barrier_option_price, conf_interval = Heston_Model(S, X, T, b, q, v0, kappa, theta, sigma, rho, num_simulations, num_time_steps, H, Phi, Nu, Pos)
 
         # Display results
         st.write('Black-Scholes Closed-Form:', Formule_Fermée)
