@@ -266,8 +266,8 @@ def barrier_option_page():
         N_simulation = 10000
         kappa = 2.0
         v0 =0.1
-        theta = 0.1
-        rho = -0.5
+        theta = 0.04
+        rho = -0.2
 
         # Calculation
         Formule_Fermée = bsm_barrier_option(X, S, H, b, T, r, Sigma, K, Pos, Phi, Nu)
@@ -396,8 +396,8 @@ def european_option_page():
         N_simulation = 10000
         v0 = 0.1        
         kappa = 2.0     
-        theta = 0.1     
-        rho = -0.5     
+        theta = 0.04     
+        rho = -0.2     
         
 
         # Calculate and print the European option prices
